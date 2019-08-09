@@ -1,0 +1,227 @@
+---
+title: "R Notebook"
+output: html_notebook
+
+
+
+
+---
+
+```{r}
+library(MASS)
+library(ISLR)
+head(Boston, 5)
+```
+```{r}
+print.data.frame(Boston)
+```
+
+```{r}
+names(Boston)
+```
+
+```{r}
+attach(Boston)
+lm.fit = lm(medv~lstat)
+lm.fit
+```
+```{r}
+summary(lm.fit)
+
+```
+```{r}
+names(lm.fit)
+print('----------------------------')
+coef(lm.fit)
+```
+
+
+```{r}
+confint(lm.fit)
+print('----------------------------')
+predict(lm.fit,data.frame(lstat=c(5,10,15)), interval="confidence")
+```
+
+```{r}
+predict(lm.fit,data.frame(lstat=c(5,10,15)), interval="prediction")
+```
+
+```{r}
+plot(lstat, medv)
+abline(lm.fit)
+```
+Theres some eveidence of non-linearity in this plot!
+### Color Styles
+
+```{r}
+plot(lstat, medv)
+abline(lm.fit)
+# abline(lm.fit, lwd=3)
+abline(lm.fit,lwd=3, col="red")
+
+plot(lstat, medv, col="red")
+plot(lstat, medv, pch=20)
+plot(lstat, medv, pch="+")
+plot(1:20, 1:20, pch=1:20)
+```
+
+## Diagnostic plot
+```{r}
+# Par() splits plots into separate panels
+par(mfrow=c(2,2))
+# Plotting lm.fit plots all 4 diagnostic plots
+plot(lm.fit)
+```
+Alternatively we can compute the residuals from a linear regression fit using the residuals() function. The function rstudent() will return the studentized residuals, and we can use this function to plot the residuals against the fitted values
+
+```{r}
+plot(predict(lm.fit), residuals(lm.fit))
+plot(predict(lm.fit), rstudent(lm.fit))
+```
+On the basis of residual plots, there is some evidence of non-linearity. Leverage statistics can be computed for any number of predictors using the hatvalues() function
+```{r}
+which.max(hatvalues(lm.fit))
+```
+
+```{r}
+plot(hatvalues(lm.fit))
+```
+
+# Multiple Linear Regression
+
+## Two variables
+
+```{r}
+lm.fit = lm(medv~lstat+age,data=Boston)
+summary(lm.fit)
+```
+
+## All variables
+
+```{r}
+lm.fit=lm(medv~.,data=Boston)
+summary(lm.fit)
+```
+
+#### Accessing indicidual components of summary
+```{r}
+print(summary(lm.fit)$r.sq) 
+print(summary(lm.fit)$sigma)
+```
+#### Variance Inflation Factor
+Variance Inflation Factor quantifies how much the variance is inflated. Variances of the B coefficients become inflated when multicollinearity exists
+```{r}
+library(car)
+vif(lm.fit)
+```
+Most of these VIFs are low to moderate for this data.
+
+#### Regression for all variables but one
+
+```{r}
+lm.fit1 = lm(medv~.-age, data=Boston) #exluding age
+summary(lm.fit1)
+```
+Alternatively, update() can be used
+```{r}
+lm.fit1 = update(lm.fit, ~.-age)
+summary(lm.fit1)
+```
+
+
+Checking VIFs again. Did removing age reduce potential multicollinearity? Not really
+
+```{r}
+vif(lm.fit1)
+```
+
+## Interaction terms
+
+The syntax _lstat:black_ tells R to include an interaction term between _lstat_ and _black_
+The syntaxt _lstat*age_ simultaneously includes _lstat_, _age_, and interaction term _lstat:age_
+
+```{r}
+summary(lm(medv~lstat*age,data=Boston))
+```
+
+# Non-linear transformations of the predictors
+
+Given predictor X, we can create X^2 using _I(X^2)_. 
+
+```{r}
+lm.fit2 = lm(medv~lstat+I(lstat^2))
+summary(lm.fit2)
+```
+
+The near-zero p-value associated with the quadratic term suggests its an improced model. We can use the anova() function to further quantify the extent to which the quadratic fit is superior to the linear fit
+
+
+```{r}
+lm.fit=lm(medv~lstat)
+anova(lm.fit,lm.fit2)
+```
+
+The F-stat of 135 and P-value of nearly zero indicates that the quadratic term improves the model.
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit2)
+
+par(mfrow=c(2,2))
+plot(lm.fit)
+```
+See how with the quadratic term, the "Residuals vs Fitted" plot has little discernible pattern, unlike with the earlier model
+
+Can also use the poly() function to create higher order polynomial terms and include the lower level terms
+
+```{r}
+lm.fit5 = lm(medv~poly(lstat,5))
+summary(lm.fit5)
+```
+This suggests additional polynomial terms up to the fifth order leads to an improvement in the model fit!
+
+### Log transformation
+
+```{r}
+summary(lm(medv~log(rm), data=Boston))
+plot(medv, rm)
+plot(medv, log(rm))
+```
+# Qualitative predictors
+
+
+```{r}
+head(Carseats)
+```
+Notice how Shelveloc is a Qualitative variable
+```{r}
+names(Carseats)
+attach(Carseats)
+```
+
+```{r}
+lm.fit=lm(Sales~.+ Income:Advertising +Price:Age, data=Carseats)
+summary(lm.fit)
+```
+
+The contrasts() function returns the coding that R uses for dummay variables
+```{r}
+contrasts(ShelveLoc)
+```
+# Writing functions
+
+```{r}
+LoadLibraries
+```
+```{r}
+LoadLibraries=function(){
+  library(ISLR)
+  library(MASS)
+  print("The libraries have been loaded.")
+}
+LoadLibraries()
+```
+
+
+
+
