@@ -5,6 +5,12 @@ output: html_notebook
 
 
 
+```{r}
+install.packages('ISLR')
+install.packages('car')
+```
+
+
 ---
 
 ```{r}
@@ -34,7 +40,6 @@ names(lm.fit)
 print('----------------------------')
 coef(lm.fit)
 ```
-
 
 ```{r}
 confint(lm.fit)

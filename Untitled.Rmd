@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+# Conceptual Questions
+
+2, 3a
+
+#### 1. Describe the null hypotheses to which the p-values given in table 3.4 correspond. Explain what conclusions you xan draw based on these p-values. Your explanation should be phrased in terms of the `sales`, `tv`, `radio`, and `newspaper`, rather than in terms of the linear model
+
+The null hypothesis is that the slope (Beta coefficient), B, of a given prector (i.e. `tv`) with respect to sales is B = 0. The p-vslues in tsble 3.4 illustrate (assuming we pre-determined an alpha of 0.05) that we can reject the null hypothesis that B = 0 for Tv, and radio, however we fail to reject the null hypothesis for newpaper.
+
+#### 2. Carefully explain the differences between the KNN classifier and KNN regression models
+
+The KNN regression method, given a prediction point x0, identifies the K closest observations, just like KNN classification.These K-closest observations to the prediction point x0 are averaged to estimate f(x0)
+
+****
+
+#### 3. Suppose we have a dataset with five predictors, X1 = GPA, X2 = IQ, X3 = Gender (1 for female and 0 for male), X4 = Interaction between GPA and IQ, X5 = interaction between GPA and Gender. The response is starting salary post-graducation (in thousands of dollars). Suppose we use least squares to fit the model, and get B0 = 50, B1 = 20, B2 = 0.07, B3 = 35, B4 = 0.01, and B5 = -10.
+
+#### a) which answer is correct and why?
+  i. For a fixed value of GPA and IQ, males earn more on average than females
+  __ii. For a fixed value of IQ and GPA, females earn more on average than males__
+  iii. For a fixed value of IQ and GPA, males earn more on average than females provided that the GPA is high enough
+  iv. For a fixed value of IQ and GPA, females earn more on average than males provided that the GPA is high enough.
+  
+#### b) Predict the salary of a female with IQ 110 and GPA of 4.0
+
+salary = B0 + B1*X1 + B2*X2 + B3*X3 + B4*X4 + B5*X5
+
+SALARY = 50 + 20\*GPA + 0.07\*IQ + 35\*GENDER + 0.01\*GPAxIQ + -10\*GPAxGENDER
+```{r}
+salary = 50 + 20*4 + 0.07*110 + 35*1 + 0.01*(110*4)+ -10*(4*1)
+print(salary)
+
+```
+
+#### c) True or False: Since the coefficient for the GPA/IQ interaction term is very small, there is little evidence of an interaction effect. Justify your answer.
+
+False, an interaction effect is evidenced via hypothesis test, and requires more terms than just the mean of B4 - information about the spread of this estimated coefficient is also necessary. for instance, if the standard deviation was 0.00001, than B4 is clearly non-zero and therefore there would be sufficient evidence.
+
+#### 4. I collect a set of data (n=100 observation) containing a single predictor and a quantitative response. I then fit a linear regression to the model, as well as a seperate cubic regression i.e. Y = B0 + B1\*X + B2\*X^2 + B3\*X^3 + e
+
+#### a) suppose that the true relationship between X and Y is linear. Consider the training residual sum of swuares (RSS) for the linear regression and also the training RSS for the cubic regression. Would we expect one to be lower than the other, would we expect them to be the same, or is there not enough info to tell? Justify.
+
+#### b)
