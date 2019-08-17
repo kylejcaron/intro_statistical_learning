@@ -477,6 +477,265 @@ confint(fit.lm3)
 
 Confidence intervals are tighter for original populations with smaller variance
 
-***
+> Exercise 14:
 
+__Part a__
+```{r}
+set.seed(1)
+x1=runif(100)
+x2 = 0.5*x1 + rnorm(100)/10
+y = 2 + 2*x1+ 0.3*x2 + rnorm(100)
+
+```
+Population regression is $y = \beta_{0} + \beta_{1} x_1 + \beta_{2} x_2 + \varepsilon$, where $\beta_{0}=2$, $\beta_{1}=2$ and $\beta_{2}=0.3$
+
+__Part b)__
+
+```{r}
+library(car)
+cor(x1,x2)
+plot(x1,x2)
+
+```
+
+__Part c)__
+```{r}
+lm.fit = lm(y~x1+x2)
+vif(lm.fit)
+summary(lm.fit)
+```
+
+Estimated beta coefficients are $\hat{\beta_{0}}=2.13$, $\hat{\beta_{1}}=1.44$ and $\hat{\beta_{2}}=1.01$. Coefficient for x1 is statistically significant but the coefficient for x2 is not given the presense of x1. These betas try to estimate the population betas: $\hat{\beta_{0}}$ is close (rounds to 2), $\hat{\beta_{1}}$ is 1.44 instead of 2 with a high standard error and $\hat{\beta_{2}}$ is farthest off.
+
+Reject $H_0 : \beta_1=0$; Cannot reject $H_0 : \beta_2=0$
+
+
+__Part d)__
+
+```{r}
+fit.lm1 <- lm(y~x1)
+summary(fit.lm1)
+```
+
+p-value is close to 0, can reject $H_0 : \beta_1=0$
+
+__Part e)__
+
+```{r}
+fit.lm2 <- lm(y~x2)
+summary(fit.lm2)
+```
+
+p-value is close to 0, can reject $H_0 : \beta_2=0$
+
+__Part f)__
+
+No. Without the presence of other predictors, both $\beta_1$ and $\beta_2$ are statistically significant. In the presence of other predictors, $\beta_2$ is no longer statistically significant.
+
+__Part g)__
+
+```{r}
+x1 = c(x1, 0.1)
+x2 = c(x2, 0.8)
+y = c(y, 6)
+lm.fit1 = lm(y~x1+x2)
+summary(lm.fit1)
+```
+
+```{r}
+lm.fit2 = lm(y~x1)
+summary(lm.fit2)
+```
+
+```{r}
+lm.fit3 = lm(y~x2)
+summary(lm.fit3)
+
+```
+In the first model, it shifts x1 to statistically insignificance and shifts x2 to statistiscal significance from the change in p-values between the two linear regressions.
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit1)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit2)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.fit3)
+```
+
+The point is high leverage in the first and 3rd models
+
+```{r}
+plot(predict(lm.fit1), rstudent(lm.fit1))
+plot(predict(lm.fit2), rstudent(lm.fit2))
+plot(predict(lm.fit3), rstudent(lm.fit3))
+
+```
+
+Looking at the studentized residuals, we don’t observe points too far from the |3| value cutoff, except for the second linear regression: y ~ x1.
+
+> Exercise 15:
+
+__Part a)__
+
+```{r}
+library(MASS)
+summary(Boston)
+
+```
+
+```{r}
+names(Boston)
+```
+
+```{r}
+?Boston
+```
+
+
+```{r}
+attach(Boston)
+lm.fit1 = lm(crim~zn)
+lm.fit2 = lm(crim~indus)
+lm.fit3 = lm(crim~chas)
+lm.fit4 = lm(crim~nox)
+lm.fit5 = lm(crim~rm)
+lm.fit6 = lm(crim~age)
+lm.fit7 = lm(crim~dis)
+lm.fit8 = lm(crim~tax)
+lm.fit9 = lm(crim~ptratio)
+lm.fit10 = lm(crim~black)
+lm.fit11 = lm(crim~lstat)
+lm.fit12 = lm(crim~medv)
+lm.fit13 = lm(crim~rad)
+
+summary(lm.fit1)
+summary(lm.fit2)
+summary(lm.fit3)
+summary(lm.fit4)
+summary(lm.fit5)
+summary(lm.fit6)
+summary(lm.fit7)
+summary(lm.fit8)
+summary(lm.fit9)
+summary(lm.fit10)
+summary(lm.fit11)
+summary(lm.fit12)
+summary(lm.fit13)
+
+```
+
+Fail to reject the null hypothesis for chas
+
+__Part B__
+
+```{r}
+cor(Boston)
+```
+
+```{r}
+lm.fit = lm(crim~., data=Boston)
+summary(lm.fit)
+```
+chas still isnt significant. age, rm, indus, tax, ptratio, and lstat are no longer statistically significant, however there is colinearity (see below)
+
+
+```{r}
+vif(lm.fit)
+```
+
+
+```{r}
+x = c(coefficients(lm.fit1)[2],
+      coefficients(lm.fit2)[2],
+      coefficients(lm.fit3)[2],
+      coefficients(lm.fit4)[2],
+      coefficients(lm.fit5)[2],
+      coefficients(lm.fit6)[2],
+      coefficients(lm.fit7)[2],
+      coefficients(lm.fit8)[2],
+      coefficients(lm.fit9)[2],
+      coefficients(lm.fit10)[2],
+      coefficients(lm.fit11)[2],
+      coefficients(lm.fit12)[2],
+      coefficients(lm.fit13)[2])
+y = coefficients(lm.fit)[2:14]
+plot(x, y)
+```
+Coefficient for nox is approximately -10 in univariate model and 31 in multiple regression model.
+
+
+```{r}
+lm.zn = lm(crim~poly(zn,3))
+summary(lm.zn) # 1, 2
+plot(zn,crim)
+```
+
+```{r}
+lm.indus = lm(crim~poly(indus,3))
+summary(lm.indus) # 1, 2, 3
+plot(indus,crim)
+```
+
+
+```{r}
+lm.rm = lm(crim~poly(rm,3))
+summary(lm.rm) # 1, 2
+plot(rm, crim)
+```
+
+
+```{r}
+lm.age = lm(crim~poly(age,3))
+summary(lm.age) # 1, 2, 3
+plot(age,crim)
+```
+
+```{r}
+lm.dis = lm(crim~poly(dis,3))
+summary(lm.dis) # 1, 2, 3
+plot(dis, crim)
+```
+
+```{r}
+lm.rad = lm(crim~poly(rad,3))
+summary(lm.rad) # 1, 2
+plot(rad,crim)
+```
+
+```{r}
+lm.tax = lm(crim~poly(tax,3))
+summary(lm.tax) # 1, 2
+plot(tax,crim)
+```
+
+```{r}
+lm.ptratio = lm(crim~poly(ptratio,3))
+summary(lm.ptratio) # 1, 2, 3
+plot(ptratio, crim)
+```
+
+```{r}
+lm.black = lm(crim~poly(black,3))
+summary(lm.black) # 1
+plot(black, crim)
+```
+
+```{r}
+lm.lstat = lm(crim~poly(lstat,3))
+summary(lm.lstat) # 1, 2
+plot(lstat, crim)
+```
+
+```{r}
+lm.medv = lm(crim~poly(medv,3))
+summary(lm.medv) # 1, 2, 3
+plot(medv,crim)
+```
 
