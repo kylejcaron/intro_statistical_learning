@@ -1,0 +1,199 @@
+
+# Lab: Cross Validation and the Bootstrap
+
+> The Validation Set Approach
+
+
+First, the data will be split with the sample() function into  two halves
+
+```{r}
+library(ISLR)
+set.seed(1)
+dim(Auto)
+train = sample(392,196)
+```
+
+```{r}
+lm.fit=lm(mpg~horsepower, data=Auto,subset=train)
+```
+
+We will now get an estimate of the MSE on the validation set, specified by [-train]
+```{r}
+attach(Auto)
+mean((mpg[-train] - predict(lm.fit, Auto)[-train])^2) 
+```
+The estimated test MSE for the linear regression fit is 23.26601. We can use the `poly()` function to estimate the test error for the quadratic and cubic regressions. 
+
+```{r}
+lm.fit2=lm(mpg~ poly(horsepower,2), data=Auto, subset=train)
+mean((mpg[-train] - predict(lm.fit2, Auto)[-train])^2) 
+
+lm.fit3=lm(mpg~ poly(horsepower,3), data=Auto, subset=train)
+mean((mpg[-train] - predict(lm.fit3, Auto)[-train])^2) 
+```
+
+If we choose a different training set instead, we will obtain somewhat different errors on the validation set
+
+```{r}
+set.seed(3)
+train = sample(392,196)
+lm.fit=lm(mpg~horsepower, subset=train)
+mean((mpg[-train] - predict(lm.fit, Auto)[-train])^2) 
+```
+
+```{r}
+lm.fit2=lm(mpg~ poly(horsepower,2), data=Auto, subset=train)
+mean((mpg[-train] - predict(lm.fit2, Auto)[-train])^2) 
+
+lm.fit3=lm(mpg~ poly(horsepower,3), data=Auto, subset=train)
+mean((mpg[-train] - predict(lm.fit3, Auto)[-train])^2) 
+```
+
+These results are consisten with out previous findings: A model that predicts mpg with a quadratic function of horsepower performs better than a model that involves only a linear function of horsepower, and there is little evidence in favor of a model that uses a cubic fit of horsepower.
+
+> Leave-One-Out Cross Validation
+
+LOOCV estimate can be automatically estimated for any generalized linear model with `glm()` and `cv.glm()` functions. If we use `glm()` without the `family="binomial"` argument, then it performs liunear regression just like lm() as shown below
+
+```{r}
+glm.fit = glm(mpg~horsepower, data=Auto)
+coef(glm.fit)
+
+lm.fit = glm(mpg~horsepower, data=Auto)
+coef(lm.fit)
+```
+
+In this lab we will use `glm()` for linear regression rather than `lm()`, since `glm()` can be used together with `cv.glm()`. `cv.glm()` is part of the `boot` library.
+
+```{r}
+library(boot)
+glm.fit = glm(mpg~horsepower, data=Auto)
+cv.err = cv.glm(Auto, glm.fit)
+cv.err$delta
+```
+
+The two numbers in the `delta` vector contian the CV results. In this case, the numbers are near identical and correspond to the LOOCV statistic. There are situations where these two numbers can differ as shown below.
+
+We will repeat the process for increasingly complex polynomial fits, using the for() function to imitate a for loop from polynomial fits i=1 to i=5
+
+```{r}
+cv.error=rep(0,5)
+for (i in 1:5) {
+  glm.fit=glm(mpg~poly(horsepower, i), data=Auto)
+  cv.error[i] = cv.glm(Auto, glm.fit)$delta[1]
+}
+cv.error
+```
+We can see a sharp drop in the estimated MSE between the linear and quadratic fits, but then no clear improvement from using higher-order polynomials. A quick reminder, less complexity (i.e. lower-order polynomials) lead to less variance, and therefore are less prone to over fitting. In this case, the quadratic fit makes the most sense since there is little improvement afterwards.
+
+> k-Fold Cross-Validation
+
+The `cv.glm()` function can also be used for k-Fold CV. Below we will specify k=10, a common choice for k (past studies have found that k=5 and k=10 empirically tend to give better estimates of test error). We will also look a tpolynomial fits 1:10.
+
+```{r}
+set.seed(17)
+cv.error.10=rep(0,10)
+for (i in 1:10) {
+  glm.fit=glm(mpg~poly(horsepower, i), data=Auto)
+  cv.error.10[i] = cv.glm(Auto, glm.fit, K=10)$delta[1]
+  
+}
+cv.error.10
+```
+Notice how the computation time is much faster than LOOCV. This is a major benefit of K-fold CV, as well as a reduction in Bias. We can also see that K=10 Fold CV helps us reach the same conclusion, i=2 is the best polynomial fit, since higher order polynomials lead to minimal improvement.
+
+A quick note on `delta` argument, the first number is the standard CV estimate, the second number is a bias-corrected estimate. They may be similar in this dataset, but that is not always the case.
+
+> The Bootstrap
+
+### Estimatic the accuracy of a statistic of interest
+
+One of the great advantages of the Bootstrap is that it can be applied in almost all situations. No complicated mathematical equations are required. Performing a bootstrap in R requires only two steps. First, create a function that computes the statistic of interest. Then, use the `boot()` function to perform the bootstrap by repeatedly sampling oberservations from the dataset with replacement.
+
+To illustrate use of the bootstrap, we will look at financial fata from the `Portfolio` dataset, and create a function `alpha.fn()` which takes as input the X,Y data, as well as a vector to specify which obersvations should be used, to estimate _a_.
+
+```{r}
+alpha.fn=function(data,index){
+  X=data$X[index]
+  Y=data$Y[index]
+  return ((var(Y)-cov(X,Y))/(var(X) + var(Y) - 2*cov(X,Y)))
+}
+```
+
+The following example estimates alpha with all 100 observations
+```{r}
+dim(Portfolio)
+alpha.fn(Portfolio, 1:100)
+```
+
+The next command uses `sample()` to randomly select 100 observations from range 1:100 with replacement. This is equivalent to selecting a new bootstrap dataset and recomputing a based on the new dataset.
+
+```{r}
+set.seed(1)
+alpha.fn(Portfolio, sample(100, 100, replace=T))
+
+```
+
+We can implement a bootstrap analysis by performing this command many times, recording all of the corresponding estimates for a, and computing the resulting standard deviation. However, `boot()` automates this approach. Below we produce R = 1,000 bootstrap estimates for _a_
+
+```{r}
+boot(Portfolio, alpha.fn, R=1000)
+
+```
+
+The final estimate shows that using the original data, `a_hat` = 0.5758 and that the Bootstrap estimate for `SE(a_hat)` is 0.09366
+
+> Estimating the Accuracy of a Linear Regression model
+
+The bootstrap approach can be used to asses the variability of the coefficient estimates and predictions from a statistical learning method. 
+
+```{r}
+boot.fn=function(data,index){
+  return(coef(lm(mpg~horsepower,data=data,subset=index)))
+}
+boot.fn(Auto,1:392)
+```
+
+The bootsrap can also be used to create bootstrap estimates for the intercept and slope terms. Heres a quick example on just 2 bootstrap samples
+```{r}
+set.seed(1)
+boot.fn(Auto, sample(392,392,replace=T))
+
+boot.fn(Auto, sample(392,392,replace=T))
+```
+
+Next, the `boot()` function is used to compute the standard errors of 1,000 bootstrap estimates for the intercept and slope terms
+
+```{r}
+boot(Auto, boot.fn, 1000)
+```
+
+The `summary()` function can also be used to compute the standard errors
+
+```{r}
+summary(lm(mpg~horsepower,data=Auto))$coef
+```
+Interestingly, these estimates are somewhat different from the bootstrap estimates. __Does this indicate a problem with the bootstrap?__ In fact, it suggests the opposite. Recall the standard formulas (used for `summary()`, found on page 66 of ISL) rely on certain assumptions. For example, they depend on the unknown parameter, sigma^2, the noise variance. We then estimate sigma^2 using the RSS. Now, although the formula for standard errors do not rely on the linear model being correct, the estimate for sigma^2 does. We see in the plot below that sigma^2 is non-linear
+
+```{r}
+plot(horsepower,mpg)
+```
+Since the fit is non-linear, the residuals from a linear fit will be inflated, and therefore so will sigma^2. 
+
+Secondly, the standard formulas assume (somewhat unrealistically) that that the x_i are fixed, and all the variability comes from the variation in the errors epsilon_i. The bootsrap approach does not rely on any of these assumptions, and so it is likely fiving a more accurate estimate of the standard errors of Beta_0 and Beta_1 than the summary() function
+
+Below we perform the bootstrap for the quadratic function
+```{r}
+boot.fn= function(data,index){
+  return(coefficients(lm(mpg~horsepower + I(horsepower^2),data=data,subset=index)))
+}
+set.seed(1)
+boot(Auto, boot.fn, 1000)
+```
+```{r}
+summary(lm(mpg~horsepower + I(horsepower^2),data=Auto))$coef
+
+```
+
+
+
