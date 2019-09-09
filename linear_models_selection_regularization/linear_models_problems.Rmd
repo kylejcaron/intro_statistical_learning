@@ -1,0 +1,596 @@
+
+# Conceptual
+__1. We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing 0, 1, 2, . . . , p predictors. Explain your answers:__
+
+__(a) Which of the three models with k predictors has the smallest training RSS?__
+Best subset will have the smallest train RSS because the models will optimize on the training RSS and best subset will try every model that forward and backward selection will try.
+
+__(b) Which of the three models with k predictors has the smallest test RSS?__
+
+The best test RSS model could be any of the three. Best subset could easily overfit if the data has large $p$ predictors relative to $n$ observations. Forward and backward selection might not converge on the same model but try the same number of models and hard to say which selection process would be better. 
+
+__(c) True or False:__
+__i. The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k+1)-variable model identified by forward stepwise selection.__
+TRUE
+
+__ii. The predictors in the k-variable model identified by back- ward stepwise are a subset of the predictors in the (k + 1)- variable model identified by backward stepwise selection.__
+TRUE
+
+__iii. The predictors in the k-variable model identified by back- ward stepwise are a subset of the predictors in the (k + 1)- variable model identified by forward stepwise selection.__
+FALSE
+
+__iv. The predictors in the k-variable model identified by forward stepwise are a subset of the predictors in the (k+1)-variable model identified by backward stepwise selection.__
+FALSE
+
+__v. The predictors in the k-variable model identified by best subset are a subset of the predictors in the (k +1)-variable model identified by best subset selection.__
+FALSE
+
+ > Exercise 2. 
+ 
+ For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.
+
+__(a) The lasso, relative to least squares, is:__
+
+__i. More flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.__
+
+__ii. More flexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.__
+
+__iii. Less flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.__
+
+__iv. Less flexible and hence will give improved prediction accu- racy when its increase in variance is less than its decrease in bias.__
+
+__Part a__
+
+iii. is TRUE - lasso puts a budget constraint on least squares (less flexible)
+
+__(b) Repeat (a) for ridge regression relative to least squares.__
+iii. is TRUE - ridge also puts a budget constraint on least squares (less flexible)
+
+
+__(c) Repeat (a) for non-linear methods relative to least squares.__
+ii. is TRUE - a non-linear model would be more flexible and have higher variance, less bias
+
+>EXERCISE 3:
+
+__Part A: As we increase s from 0, the training RSS will:__
+
+Steadily decrease - as $s$ is increased, there is less and less constraint on the model and it should always have a better training error (if $s$ is increased to $s'$, then the best model using a budget of $s$ would be included when using a budget of $s'$)
+
+__Part b) Repeat (a) for test RSS.__
+Decrease initially, and then eventually start increasing in a U shape.
+__Part (c) Repeat (a) for variance.__
+
+Steadily increase. variance always increases with fewer constraints
+
+__Part (d) Repeat (a) for (squared) bias.__
+ Steadily decrease. Bias always decreases with more model flexibility
+ 
+__Part (e) Repeat (a) for the irreducible error.__
+Remain constant. the irreducible error is a constant value, not related to model selection
+
+>EXERCISE 4:
+
+__Part a)__
+
+iii. is TRUE - training error increases steadily
+
+__Part b)__
+
+ii. is TRUE - test error will decrease initially and then increase
+
+__Part c)__
+
+iv. is TRUE - variance always decrease with more constraints
+
+__Part d)__
+
+iii. is TRUE - bias always increase with less model flexibility
+
+__Part e)__
+v. is TRUE - the irreducible error is a constant value, not related to model selection
+
+> Exercise 5:
+
+__Part A__
+
+Ridge: minimize $(y_1 - \hat\beta_1x_{11} - \hat\beta_2x_{12})^2 + (y_2 - \hat\beta_1x_{21} - \hat\beta_2x_{22})^2 + \lambda (\hat\beta_1^2 + \hat\beta_2^2)$
+
+__Part b)__
+
+__Step 1:__ Expanding the equation from Part a:
+
+$$(y_1 - \hat\beta_1 x_{11} - \hat\beta_2 x_{12})^2 + (y_2 - \hat\beta_1 x_{21} - \hat\beta_2 x_{22})^2 + \lambda (\hat\beta_1^2 + \hat\beta_2^2) \\
+= (y_1^2 + \hat\beta_1^2 x_{11}^2 + \hat\beta_2^2 x_{12}^2 - 2 \hat\beta_1 x_{11} y_1 - 2 \hat\beta_2 x_{12} y_1 + 2 \hat\beta_1 \hat\beta_2 x_{11} x_{12}) \\
++ (y_2^2 + \hat\beta_1^2 x_{21}^2 + \hat\beta_2^2 x_{22}^2 - 2 \hat\beta_1 x_{21} y_2 - 2 \hat\beta_2 x_{22} y_2 + 2 \hat\beta_1 \hat\beta_2 x_{21} x_{22}) \\
++ \lambda \hat\beta_1^2 + \lambda \hat\beta_2^2$$
+
+__Step 2:__ Taking the partial deritive to $\hat\beta_1$ and setting equation to 0 to minimize:
+
+$$\frac{\partial }{\partial \hat\beta_1}: (2\hat\beta_1x_{11}^2-2x_{11}y_1+2\hat\beta_2x_{11}x_{12}) + (2\hat\beta_1x_{21}^2-2x_{21}y_2+2\hat\beta_2x_{21}x_{22}) + 2\lambda\hat\beta_1 = 0$$
+
+__Step 3:__ Setting $x_{11}=x_{12}=x_1$ and $x_{21}=x_{22}=x_2$ and dividing both sides of the equation by 2:
+
+$$(\hat\beta_1x_1^2-x_1y_1+\hat\beta_2x_1^2) + (\hat\beta_1x_2^2-x_2y_2+\hat\beta_2x_2^2) + \lambda\hat\beta_1 = 0$$
+
+$$\hat\beta_1 (x_1^2+x_2^2) + \hat\beta_2 (x_1^2+x_2^2) + \lambda\hat\beta_1 = x_1y_1 + x_2y_2$$
+
+__Step 4:__ Add $2\hat\beta_1x_1x_2$ and $2\hat\beta_2x_1x_2$ to both sides of the equation:
+
+$$\hat\beta_1 (x_1^2 + x_2^2 + 2x_1x_2) + \hat\beta_2 (x_1^2 + x_2^2 + 2x_1x_2) + \lambda\hat\beta_1 = x_1y_1 + x_2y_2 + 2\hat\beta_1x_1x_2 + 2\hat\beta_2x_1x_2 \\
+\hat\beta_1 (x_1 + x_2)^2 + \hat\beta_2 (x_1 + x_2)^2 + \lambda\hat\beta_1 = x_1y_1 + x_2y_2 + 2\hat\beta_1x_1x_2 + 2\hat\beta_2x_1x_2$$
+
+__Step 5:__ Because $x_1+x_2=0$, we can eliminate the first two terms:
+
+$$\lambda\hat\beta_1 = x_1y_1 + x_2y_2 + 2\hat\beta_1x_1x_2 + 2\hat\beta_2x_1x_2$$
+
+__Step 6:__ Similarly by taking the partial deritive to $\hat\beta_2$, we can get the equation:
+
+$$\lambda\hat\beta_2 = x_1y_1 + x_2y_2 + 2\hat\beta_1x_1x_2 + 2\hat\beta_2x_1x_2$$
+
+__Step 7:__ The left side of the equations for both $\lambda\hat\beta_1$ and $\lambda\hat\beta_2$ are the same so we have:
+
+$$\lambda\hat\beta_1 = \lambda\hat\beta_2$$
+
+$$\hat\beta_1 = \hat\beta_2$$
+
+
+__Part c)__
+
+Lasso: minimize $(y_1 - \hat\beta_1x_{11} - \hat\beta_2x_{12})^2 + (y_2 - \hat\beta_1x_{21} - \hat\beta_2x_{22})^2 + \lambda (|\hat\beta_1| + |\hat\beta_2|)$
+
+__Part d)__
+
+Replacing the constraint term from Part b, the derivative term to $\beta$ is:
+
+$$\frac{\partial }{\partial \hat\beta} (\lambda |\beta|): \lambda\frac{|\beta|}{\beta}$$
+
+Following through the steps in Part b, we get:
+
+$$\lambda\frac{|\beta_1|}{\beta_1} = \lambda\frac{|\beta_2|}{\beta_2}$$
+
+So it seems that the lasso just requires that $\beta_1$ and $\beta_2$ are both positive or both negative (ignoring possibility of 0...)
+
+***
+
+<a id="ex06"></a>
+
+>EXERCISE 6:
+__Part a)__
+
+```{r, warning=FALSE, message=FALSE}
+betas <- seq(-10,10,0.1)
+eq.ridge <- function(beta, y=7, lambda=10) (y-beta)^2 + lambda*beta^2
+plot(betas, eq.ridge(betas), xlab="beta", main="Ridge Regression Optimization", pch=1)
+points(5/(1+10), eq.ridge(7/(1+10)), pch=16, col="red", cex=2)
+```
+
+For $y=7$ and $\lambda=10$, $\hat\beta=\frac{7}{1+10}$ minimizes the ridge regression equation
+
+__Part b)__
+
+```{r, warning=FALSE, message=FALSE}
+betas <- seq(-10,10,0.1)
+eq.lasso <- function(beta, y=7, lambda=10) (y-beta)^2 + lambda*abs(beta)
+plot(betas, eq.lasso(betas), xlab="beta", main="Lasso Regression Optimization", pch=1)
+points(7-10/2, eq.lasso(7-10/2), pch=16, col="red", cex=2)
+```
+
+For $y=7$ and $\lambda=10$, $\hat\beta=7-\frac{10}{2}$ minimizes the ridge regression equation
+
+***
+
+
+# Applied
+
+
+> Exercise 8:
+
+__(a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector ε of length n = 100.__
+
+```{r}
+set.seed(1)
+X <- rnorm(100)
+eps <- rnorm(100)
+```
+
+__Generate a response vector Y of length n = 100 according to the model Y = β0 +β1X +β2X2 +β3X3 +ε, where β0, β1, β2, and β3 are constants of your choice.__
+
+```{r}
+Y <- 5 + 10*X - 3*X^2 + 2*X^3 + eps
+plot(X,Y)
+```
+
+__(c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X,X2,...,X10. What is the best model obtained according to Cp, BIC, and adjusted R2? Show some plots to provide evidence for your answer, and report the coefficients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y .__
+
+```{r, warning=FALSE, message=FALSE}
+require(leaps)
+regfit.full <- regsubsets(Y~poly(X,10,raw=T), data=data.frame(Y,X), nvmax=10)
+(reg.summary <- summary(regfit.full))
+
+min.cp <- which.min(reg.summary$cp)  
+
+plot(reg.summary$cp, xlab="Number of Poly(X)", ylab="Best Subset Cp", type="l")
+
+points(min.cp, reg.summary$cp[min.cp], col="red", pch=4, lwd=5)
+min.bic <- which.min(reg.summary$bic)  
+
+plot(reg.summary$bic, xlab="Number of Poly(X)", ylab="Best Subset BIC", type="l")
+
+points(min.bic, reg.summary$bic[min.bic], col="red", pch=4, lwd=5)
+min.adjr2 <- which.max(reg.summary$adjr2)  
+
+plot(reg.summary$adjr2, xlab="Number of Poly(X)", ylab="Best Subset Adjusted R^2", type="l")
+points(min.adjr2, reg.summary$adjr2[min.adjr2], col="red", pch=4, lwd=5)
+coef(regfit.full, min.cp)
+coef(regfit.full, min.bic)
+coef(regfit.full, min.adjr2)
+```
+
+__(d) Repeat (c), using forward stepwise selection and also using back- wards stepwise selection. How does your answer compare to the results in (c)?__
+```{r}
+# forward selection
+regfit.fwd <- regsubsets(Y~poly(X,10,raw=T), data=data.frame(Y,X), nvmax=10)
+(fwd.summary <- summary(regfit.fwd))
+# backward selection
+regfit.bwd <- regsubsets(Y~poly(X,10,raw=T), data=data.frame(Y,X), nvmax=10)
+(bwd.summary <- summary(regfit.bwd))
+min.cp <- which.min(fwd.summary$cp)  
+plot(fwd.summary$cp, xlab="Number of Poly(X)", ylab="Forward Selection Cp", type="l")
+points(min.cp, fwd.summary$cp[min.cp], col="red", pch=4, lwd=5)
+min.cp <- which.min(bwd.summary$cp)  
+plot(bwd.summary$cp, xlab="Number of Poly(X)", ylab="Backward Selection Cp", type="l")
+points(min.cp, bwd.summary$cp[min.cp], col="red", pch=4, lwd=5)
+min.bic <- which.min(fwd.summary$bic)  
+plot(fwd.summary$bic, xlab="Number of Poly(X)", ylab="Forward Selection BIC", type="l")
+points(min.bic, fwd.summary$bic[min.bic], col="red", pch=4, lwd=5)
+min.bic <- which.min(bwd.summary$bic)  
+plot(bwd.summary$bic, xlab="Number of Poly(X)", ylab="Backward Selection BIC", type="l")
+points(min.bic, bwd.summary$bic[min.bic], col="red", pch=4, lwd=5)
+min.adjr2 <- which.max(fwd.summary$adjr2)  
+plot(fwd.summary$adjr2, xlab="Number of Poly(X)", ylab="Forward Selection Adjusted R^2", type="l")
+points(min.adjr2, fwd.summary$adjr2[min.adjr2], col="red", pch=4, lwd=5)
+min.adjr2 <- which.max(bwd.summary$adjr2)  
+plot(bwd.summary$adjr2, xlab="Number of Poly(X)", ylab="Backward Selection Adjusted R^2", type="l")
+points(min.adjr2, bwd.summary$adjr2[min.adjr2], col="red", pch=4, lwd=5)
+# coefficients of selected models
+coef(regfit.fwd, which.min(fwd.summary$cp))
+coef(regfit.bwd, which.min(bwd.summary$cp))
+coef(regfit.fwd, which.min(fwd.summary$bic))
+coef(regfit.bwd, which.min(bwd.summary$bic))
+coef(regfit.fwd, which.max(fwd.summary$adjr2))
+coef(regfit.bwd, which.max(bwd.summary$adjr2))
+```
+
+Best subset, foward selection and backward selection all resulted in the same best models
+
+
+__(e) Now fit a lasso model to the simulated data, again using X,X2, . . . , X 10 as predictors. Use cross-validation to select the optimal value of λ. Create plots of the cross-validation error as a function of λ. Report the resulting coefficient estimates, and discuss the results obtained.__
+
+```{r, message=FALSE, warning=FALSE}
+require(glmnet)
+xmat <- model.matrix(Y~poly(X,10,raw=T))[,-1]
+lasso.mod <- cv.glmnet(xmat, Y, alpha=1)
+(lambda <- lasso.mod$lambda.min)
+par(mfrow=c(1,1))
+plot(lasso.mod)
+predict(lasso.mod, s=lambda, type="coefficients")
+```
+
+Lasso regression selects the correct predictors: $X$, $X^2$ and $X^3$
+
+
+__(f) Now generate a response vector Y according to the model Y = β0 + β7X7 + ε, and perform best subset selection and the lasso. Discuss the results obtained.__
+
+```{r}
+Y2 <- 5 + 1.5*X^7 + eps
+# best subset model selection
+regfit.full <- regsubsets(Y2~poly(X,10,raw=T), data=data.frame(Y,X), nvmax=10)
+(reg.summary <- summary(regfit.full))
+min.cp <- which.min(reg.summary$cp)  
+plot(reg.summary$cp, xlab="Number of Poly(X)", ylab="Best Subset Cp", type="l")
+points(min.cp, reg.summary$cp[min.cp], col="red", pch=4, lwd=5)
+min.bic <- which.min(reg.summary$bic)  
+plot(reg.summary$bic, xlab="Number of Poly(X)", ylab="Best Subset BIC", type="l")
+points(min.bic, reg.summary$bic[min.bic], col="red", pch=4, lwd=5)
+min.adjr2 <- which.max(reg.summary$adjr2)  
+plot(reg.summary$adjr2, xlab="Number of Poly(X)", ylab="Best Subset Adjusted R^2", type="l")
+points(min.adjr2, reg.summary$adjr2[min.adjr2], col="red", pch=4, lwd=5)
+coef(regfit.full, min.cp)
+coef(regfit.full, min.bic)
+coef(regfit.full, min.adjr2)
+# lasso regression 
+xmat <- model.matrix(Y2~poly(X,10,raw=T))[,-1]
+lasso.mod <- cv.glmnet(xmat, Y2, alpha=1)
+(lambda <- lasso.mod$lambda.min)
+par(mfrow=c(1,1))
+plot(lasso.mod)
+predict(lasso.mod, s=lambda, type="coefficients")
+```
+
+Lasso selects the correct model but best subset diagnostics indicate using 1 to 4 predictors
+
+
+> Exercise 9:
+
+__9. In this exercise, we will predict the number of applications received using the other variables in the College data set.__
+
+__(a) Split the data set into a training set and a test set.__
+
+```{r, warning=FALSE, message=FALSE}
+require(ISLR)
+data(College)
+set.seed(1)
+trainid <- sample(1:nrow(College), nrow(College)/2)
+train <- College[trainid,]
+test <- College[-trainid,]
+str(College)
+```
+
+__(b) Fit a linear model using least squares on the training set, and report the test error obtained.__
+
+```{r}
+fit.lm <- lm(Apps~., data=train)
+pred.lm <- predict(fit.lm, test)
+(err.lm <- mean((test$Apps - pred.lm)^2))  # test error
+```
+
+
+
+__(c) Fit a ridge regression model on the training set, with λ chosen by cross-validation. Report the test error obtained.__
+
+```{r, warning=FALSE, message=FALSE}
+require(glmnet)
+xmat.train <- model.matrix(Apps~., data=train)[,-1]
+xmat.test <- model.matrix(Apps~., data=test)[,-1]
+fit.ridge <- cv.glmnet(xmat.train, train$Apps, alpha=0)
+(lambda <- fit.ridge$lambda.min)  # optimal lambda
+pred.ridge <- predict(fit.ridge, s=lambda, newx=xmat.test)
+(err.ridge <- mean((test$Apps - pred.ridge)^2))  # test error
+```
+
+__(d) Fit a lasso model on the training set, with λ chosen by cross- validation. Report the test error obtained, along with the number of non-zero coefficient estimates.__
+
+```{r, warning=FALSE, message=FALSE}
+require(glmnet)
+xmat.train <- model.matrix(Apps~., data=train)[,-1]
+xmat.test <- model.matrix(Apps~., data=test)[,-1]
+fit.lasso <- cv.glmnet(xmat.train, train$Apps, alpha=1)
+(lambda <- fit.lasso$lambda.min)  # optimal lambda
+pred.lasso <- predict(fit.lasso, s=lambda, newx=xmat.test)
+(err.lasso <- mean((test$Apps - pred.lasso)^2))  # test error
+coef.lasso <- predict(fit.lasso, type="coefficients", s=lambda)[1:ncol(College),]
+coef.lasso[coef.lasso != 0]
+length(coef.lasso[coef.lasso != 0])
+```
+
+__(e) Fit a PCR model on the training set, with M chosen by cross- validation. Report the test error obtained, along with the value of M selected by cross-validation.__
+
+```{r, warning=FALSE, message=FALSE}
+require(pls)
+set.seed(1)
+fit.pcr <- pcr(Apps~., data=train, scale=TRUE, validation="CV")
+validationplot(fit.pcr, val.type="MSEP")
+summary(fit.pcr)
+pred.pcr <- predict(fit.pcr, test, ncomp=16)  # min Cv at M=16
+(err.pcr <- mean((test$Apps - pred.pcr)^2))  # test error
+```
+
+
+__(f) Fit a PLS model on the training set, with M chosen by cross- validation. Report the test error obtained, along with the value of M selected by cross-validation.__
+
+```{r, warning=FALSE, message=FALSE}
+require(pls)
+set.seed(1)
+fit.pls <- plsr(Apps~., data=train, scale=TRUE, validation="CV")
+validationplot(fit.pls, val.type="MSEP")
+summary(fit.pls)
+pred.pls <- predict(fit.pls, test, ncomp=10)  # min Cv at M=10
+(err.pls <- mean((test$Apps - pred.pls)^2))  # test error
+```
+
+__(g) Comment on the results obtained. How accurately can we pre- dict the number of college applications received? Is there much difference among the test errors resulting from these five approaches?__
+
+```{r}
+err.all <- c(err.lm, err.ridge, err.lasso, err.pcr, err.pls)
+names(err.all) <- c("lm", "ridge", "lasso", "pcr", "pls")
+barplot(err.all )
+```
+
+The test errors aren't much different. The ridge and lasso seem to perform slightly better while the PCR/PLS don't show any improvement from the full linear regression model.
+
+> Exercise 10:
+
+__10. We have seen that as the number of features used in a model increases, the training error will necessarily decrease, but the test error may not. We will now explore this in a simulated data set.__
+
+__(a) Generate a data set with p = 20 features, n = 1,000 observations, and an associated quantitative response vector generated according to the model Y =Xβ+ε, where β has some elements that are exactly equal to zero.__
+
+
+```{r}
+set.seed(1)
+eps <- rnorm(1000)
+xmat <- matrix(rnorm(1000*20), ncol=20)
+betas <- sample(-5:5, 20, replace=TRUE)
+betas[c(3,6,7,10,13,17)] <- 0
+betas
+y <- xmat %*% betas + eps
+```
+
+__(b) Split your dataset into a training set containing 100 observations and a test set containing 900 observations.__
+
+```{r}
+set.seed(1)
+trainid <- sample(1:1000, 100, replace=FALSE)
+xmat.train <- xmat[trainid,]
+xmat.test <- xmat[-trainid,]
+y.train <- y[trainid,]
+y.test <- y[-trainid,]
+train <- data.frame(y=y.train, xmat.train)
+test <- data.frame(y=y.test, xmat.test)
+```
+
+__(c) Perform best subset selection on the training set, and plot the training set MSE associated with the best model of each size.__
+
+```{r}
+require(leaps)
+# predict function from chapter 6 labs
+predict.regsubsets <- function(object, newdata, id, ...){
+  form <- as.formula(object$call[[2]])
+  mat <- model.matrix(form, newdata)
+  coefi <- coef(object, id=id)
+  xvars <- names(coefi)
+  mat[,xvars]%*%coefi
+}
+regfit.full <- regsubsets(y~., data=train, nvmax=20)
+err.full <- rep(NA, 20)
+for(i in 1:20) {
+  pred.full <- predict(regfit.full, train, id=i)
+  err.full[i] <- mean((train$y - pred.full)^2)
+}
+plot(1:20, err.full, type="b", main="Training MSE", xlab="Number of Predictors")
+which.min(err.full)  # min for train error should be at max pred count
+```
+
+__(d) Plot the test set MSE associated with the best model of each size.__
+
+```{r}
+err.full <- rep(NA, 20)
+for(i in 1:20) {
+  pred.full <- predict(regfit.full, test, id=i)
+  err.full[i] <- mean((test$y - pred.full)^2)
+}
+plot(1:20, err.full, type="b", main="Test MSE", xlab="Number of Predictors")
+```
+
+__(e) For which model size does the test set MSE take on its minimum value? Comment on your results. If it takes on its minimum value for a model containing only an intercept or a model containing all of the features, then play around with the way that you are generating the data in (a) until you come up with a scenario in which the test set MSE is minimized for an intermediate model size.__
+
+```{r}
+which.min(err.full)  # optimal number of predictors from best subset
+```
+
+__(f) How does the model at which the test set MSE is minimized compare to the true model used to generate the data? Comment on the coefficient values.
+
+```{r}
+(coef.best <- coef(regfit.full, id=which.min(err.full)))
+betas[betas != 0]
+names(betas) <- paste0("X", 1:20)
+merge(data.frame(beta=names(betas),betas), data.frame(beta=names(coef.best),coef.best), all.x=T, sort=F)
+```
+The best subset model selected all the correct predictors
+
+
+__(g) Create a plot displaying RMSE(βj − β^jr) for a range of values of r, where βˆjr is the jth coefficient estimate for the best model containing r coefficients. Comment on what you observe. How does this compare to the test MSE plot from (d)?__
+
+```{r}
+err.coef <- rep(NA, 20)
+for(i in 1:20) {
+  coef.i <- coef(regfit.full, id=i)
+  df.err <- merge(data.frame(beta=names(betas),betas), data.frame(beta=names(coef.i),coef.i), all.x=T)
+  df.err[is.na(df.err[,3]),3] <- 0
+  err.coef[i] <- sqrt(sum((df.err[,2] - df.err[,3])^2))
+}
+plot(1:20, err.coef, type="b", main="Coefficient Error", xlab="Number of Predictors")
+points(which.min(err.coef), err.coef[which.min(err.coef)], col="red", pch=16)
+```
+
+The coefficient error plot shows a very similar plot to the test error plot
+
+> Exercise 11:
+
+__11. We will now try to predict per capita crime rate in the Boston data set.__
+
+__(a) Try out some of the regression methods explored in this chapter, such as best subset selection, the lasso, ridge regression, and PCR. Present and discuss results for the approaches that you consider.__
+
+```{r, warning=FALSE, message=FALSE}
+require(leaps)   # forward and backward selection
+require(glmnet)  # ridge and lasso
+require(MASS)    # Boston data set
+data(Boston)
+# split data into training and test sets
+set.seed(1)
+trainid <- sample(1:nrow(Boston), nrow(Boston)/2)
+train <- Boston[trainid,]
+test <- Boston[-trainid,]
+xmat.train <- model.matrix(crim~., data=train)[,-1]
+xmat.test <- model.matrix(crim~., data=test)[,-1]
+str(Boston)
+# ridge regression model
+fit.ridge <- cv.glmnet(xmat.train, train$crim, alpha=0)
+(lambda <- fit.ridge$lambda.min)  # optimal lambda
+pred.ridge <- predict(fit.ridge, s=lambda, newx=xmat.test)
+(err.ridge <- mean((test$crim - pred.ridge)^2))  # test error
+predict(fit.ridge, s=lambda, type="coefficients")
+# lasso regression model
+fit.lasso <- cv.glmnet(xmat.train, train$crim, alpha=1)
+(lambda <- fit.lasso$lambda.min)  # optimal lambda
+pred.lasso <- predict(fit.lasso, s=lambda, newx=xmat.test)
+(err.lasso <- mean((test$crim - pred.lasso)^2))  # test error
+predict(fit.lasso, s=lambda, type="coefficients")
+# predict function from chapter 6 labs
+predict.regsubsets <- function(object, newdata, id, ...){
+  form <- as.formula(object$call[[2]])
+  mat <- model.matrix(form, newdata)
+  coefi <- coef(object, id=id)
+  xvars <- names(coefi)
+  mat[,xvars]%*%coefi
+}
+# forward selection
+fit.fwd <- regsubsets(crim~., data=train, nvmax=ncol(Boston)-1)
+(fwd.summary <- summary(fit.fwd))
+err.fwd <- rep(NA, ncol(Boston)-1)
+for(i in 1:(ncol(Boston)-1)) {
+  pred.fwd <- predict(fit.fwd, test, id=i)
+  err.fwd[i] <- mean((test$crim - pred.fwd)^2)
+}
+plot(err.fwd, type="b", main="Test MSE for Forward Selection", xlab="Number of Predictors")
+which.min(err.fwd)
+# backward selection
+fit.bwd <- regsubsets(crim~., data=train, nvmax=ncol(Boston)-1)
+(bwd.summary <- summary(fit.bwd))
+err.bwd <- rep(NA, ncol(Boston)-1)
+for(i in 1:(ncol(Boston)-1)) {
+  pred.bwd <- predict(fit.bwd, test, id=i)
+  err.bwd[i] <- mean((test$crim - pred.bwd)^2)
+}
+plot(err.bwd, type="b", main="Test MSE for Backward Selection", xlab="Number of Predictors")
+which.min(err.bwd)
+min.cp <- which.min(fwd.summary$cp)  
+plot(fwd.summary$cp, xlab="Number of Poly(X)", ylab="Forward Selection Cp", type="l")
+points(min.cp, fwd.summary$cp[min.cp], col="red", pch=4, lwd=5)
+min.cp <- which.min(bwd.summary$cp)  
+plot(bwd.summary$cp, xlab="Number of Poly(X)", ylab="Backward Selection Cp", type="l")
+points(min.cp, bwd.summary$cp[min.cp], col="red", pch=4, lwd=5)
+min.bic <- which.min(fwd.summary$bic)  
+plot(fwd.summary$bic, xlab="Number of Poly(X)", ylab="Forward Selection BIC", type="l")
+points(min.bic, fwd.summary$bic[min.bic], col="red", pch=4, lwd=5)
+min.bic <- which.min(bwd.summary$bic)  
+plot(bwd.summary$bic, xlab="Number of Poly(X)", ylab="Backward Selection BIC", type="l")
+points(min.bic, bwd.summary$bic[min.bic], col="red", pch=4, lwd=5)
+min.adjr2 <- which.max(fwd.summary$adjr2)  
+plot(fwd.summary$adjr2, xlab="Number of Poly(X)", ylab="Forward Selection Adjusted R^2", type="l")
+points(min.adjr2, fwd.summary$adjr2[min.adjr2], col="red", pch=4, lwd=5)
+min.adjr2 <- which.max(bwd.summary$adjr2)  
+plot(bwd.summary$adjr2, xlab="Number of Poly(X)", ylab="Backward Selection Adjusted R^2", type="l")
+points(min.adjr2, bwd.summary$adjr2[min.adjr2], col="red", pch=4, lwd=5)
+```
+
+
+__(b) Propose a model (or set of models) that seem to perform well on this data set, and justify your answer. Make sure that you are evaluating model performance using validation set error, cross- validation, or some other reasonable alternative, as opposed to using training error.__
+
+
+```{r}
+err.ridge
+err.lasso
+mean(err.fwd)
+mean(err.bwd)
+```
+
+Probably choose the lasso model because its test MSE is close to best and eliminates some predictors to reduce model complexity
+
+
+__(c) Does your chosen model involve all of the features in the data set? Why or why not?__
+
+No because not all the predictors add much value to the model
+
+
+
+
